@@ -3,10 +3,12 @@ import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import SpotlightCard from "../components/SpotlightCard"
 import VideoCarousel from "../components/VideoCarousel"
+import useScrollTriggerRefresh from "../hooks/useScrollTriggerRefresh"
 
 gsap.registerPlugin(ScrollTrigger)
 
 export default function BoxStackZoom() {
+    useScrollTriggerRefresh()
     const sectionRef = useRef(null)
     const boxRefs = useRef<HTMLDivElement[]>([])
 
@@ -104,7 +106,7 @@ export default function BoxStackZoom() {
                             ref={(el) => el && (boxRefs.current[i + 1] = el)} // i+1 因为 box[0] 是标题
                             className="absolute flex items-center justify-center text-white font-black w-[90vw] max-w-[90vw] md:max-w-[980px] h-[50vh] md:h-[60vh]"
                             style={{
-                              //  backgroundColor: `hsl(${(i + 1) * 60}, 70%, 50%)`,
+                                //  backgroundColor: `hsl(${(i + 1) * 60}, 70%, 50%)`,
                                 zIndex: i + 2,
                                 top: "50%",
                                 left: "50%",
@@ -112,24 +114,24 @@ export default function BoxStackZoom() {
                             }}
                         >
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <SpotlightCard className="w-full h-full p-4">
-  <div className="flex flex-col md:flex-row h-full w-full items-center justify-center gap-6">
-    {/* 左图放大占位 */}
-    <div className="w-full md:w-1/3 h-[250px] md:h-full">
-      <img
-        src={card.image}
-        alt={card.title}
-        className="w-full h-full object-cover rounded-xl"
-      />
-    </div>
+                                <SpotlightCard className="w-full h-full p-4">
+                                    <div className="flex flex-col md:flex-row h-full w-full items-center justify-center gap-6">
+                                        {/* 左图放大占位 */}
+                                        <div className="w-full md:w-1/3 h-[250px] md:h-full">
+                                            <img
+                                                src={card.image}
+                                                alt={card.title}
+                                                className="w-full h-full object-cover rounded-xl"
+                                            />
+                                        </div>
 
-    {/* 右文 */}
-    <div className="w-full md:w-2/3 text-center md:text-left flex flex-col justify-center px-2 md:px-6">
-      <h3 className="text-2xl font-bold">{card.title}</h3>
-      <p className="mt-2 text-base leading-relaxed">{card.description}</p>
-    </div>
-  </div>
-</SpotlightCard>
+                                        {/* 右文 */}
+                                        <div className="w-full md:w-2/3 text-center md:text-left flex flex-col justify-center px-2 md:px-6">
+                                            <h3 className="text-2xl font-bold">{card.title}</h3>
+                                            <p className="mt-2 text-base leading-relaxed">{card.description}</p>
+                                        </div>
+                                    </div>
+                                </SpotlightCard>
                             </div>
                         </div>
                     ))}

@@ -9,6 +9,8 @@ function App() {
       <Hero />
       <About/>
       <WavePartyK/>
+      <WavePartyK/>
+      <WavePartyK/>
     </main>
   )
 }

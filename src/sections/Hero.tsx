@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ScrollToPlugin } from "gsap/ScrollToPlugin"
@@ -8,25 +8,18 @@ gsap.registerPlugin(ScrollTrigger)
 gsap.registerPlugin(ScrollToPlugin)
 
 export default function Hero() {
-  const sectionRef = useRef(null)
-  const bgRef = useRef(null)
-  const titleRef = useRef(null)
-  const subtitleRef = useRef(null)
-  const navbarRef = useRef(null)
-  const arrowRef = useRef(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const bgRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const subtitleRef = useRef<HTMLParagraphElement>(null)
+  const navbarRef = useRef<HTMLElement>(null)
+  const arrowRef = useRef<HTMLDivElement>(null)
+  const topAreaRef = useRef<HTMLDivElement>(null)
+  const [isHovering, setIsHovering] = useState(false)
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // ✅ Navbar 顯示隱藏
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: "bottom top",
-        end: "+=1",
-        toggleActions: "play none none reverse",
-        onEnter: () => gsap.to(navbarRef.current, { y: -100, duration: 0.5, ease: "power2.out" }),
-        onLeaveBack: () => gsap.to(navbarRef.current, { y: 0, duration: 0.5, ease: "power2.out" })
-      })
-
       // ✅ 背景縮小，露出白邊
       gsap.fromTo(bgRef.current,
         { scaleX: 1 },
@@ -68,11 +61,72 @@ export default function Hero() {
       })
     }, sectionRef)
 
-    return () => ctx.revert()
-  }, [])
+    // 添加全局滚动监听
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+      const heroHeight = sectionRef.current?.clientHeight || 0
+
+      if (scrollY > heroHeight && !isHovering) {
+        gsap.to(navbarRef.current, { 
+          y: -100, 
+          duration: 0.3, 
+          ease: "power2.out" 
+        })
+      } else {
+        gsap.to(navbarRef.current, { 
+          y: 0, 
+          duration: 0.3, 
+          ease: "power2.out" 
+        })
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      ctx.revert()
+    }
+  }, [isHovering])
+
+  // 处理顶部区域悬停
+  const handleTopAreaHover = (isHovering: boolean) => {
+    setIsHovering(isHovering)
+    
+    if (isHovering) {
+      // 清除之前的定时器
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current)
+      }
+      // 显示 navbar
+      gsap.to(navbarRef.current, { 
+        y: 0, 
+        duration: 0.3, 
+        ease: "power2.out" 
+      })
+    } else {
+      // 设置延迟隐藏
+      hideTimeoutRef.current = setTimeout(() => {
+        if (window.scrollY > 0) {
+          gsap.to(navbarRef.current, { 
+            y: -100, 
+            duration: 0.3, 
+            ease: "power2.out" 
+          })
+        }
+      }, 3000) // 3秒后隐藏
+    }
+  }
 
   return (
     <section ref={sectionRef} className="relative h-screen w-full overflow-hidden scrollbar-hide">
+      {/* 顶部悬停区域 */}
+      <div
+        ref={topAreaRef}
+        className="fixed top-0 left-0 w-full h-20 z-40"
+        onMouseEnter={() => handleTopAreaHover(true)}
+        onMouseLeave={() => handleTopAreaHover(false)}
+      />
+
       {/* 背景圖層 */}
       <div
         ref={bgRef}
