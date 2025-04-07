@@ -34,7 +34,7 @@ export default function WebgiViewer() {
             
             const tonemap = newViewer.getPlugin(TonemapPlugin as any)
             if (tonemap) {
-                tonemap.config.clipBackground = true
+            //    tonemap.config.clipBackground = true
             }
             
             newViewer.scene.activeCamera.setCameraOptions({

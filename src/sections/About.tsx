@@ -189,6 +189,7 @@ export default function About() {
 
     return (
         <section 
+            id="about"
             ref={sectionRef} 
             className="relative min-h-[250vh] bg-gradient-to-b from-white to-gray-100 px-6 py-32 overflow-hidden text-black"
         >

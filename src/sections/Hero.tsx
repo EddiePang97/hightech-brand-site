@@ -16,11 +16,12 @@ export default function Hero() {
   const arrowRef = useRef<HTMLDivElement>(null)
   const topAreaRef = useRef<HTMLDivElement>(null)
   const [isHovering, setIsHovering] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // ✅ 背景縮小，露出白邊
+      // 背景縮小，露出白邊
       gsap.fromTo(bgRef.current,
         { scaleX: 1 },
         {
@@ -35,7 +36,7 @@ export default function Hero() {
         }
       )
 
-      // ✅ 標題縮放
+      // 標題縮放
       gsap.fromTo([titleRef.current, subtitleRef.current],
         { scale: 1.2, opacity: 0.8 },
         {
@@ -51,7 +52,7 @@ export default function Hero() {
         }
       )
 
-      // ✅ Scroll Down Arrow 動畫
+      // Scroll Down Arrow 動畫
       gsap.to(arrowRef.current, {
         y: 10,
         repeat: -1,
@@ -61,23 +62,14 @@ export default function Hero() {
       })
     }, sectionRef)
 
-    // 添加全局滚动监听
     const handleScroll = () => {
       const scrollY = window.scrollY
       const heroHeight = sectionRef.current?.clientHeight || 0
 
       if (scrollY > heroHeight && !isHovering) {
-        gsap.to(navbarRef.current, { 
-          y: -100, 
-          duration: 0.3, 
-          ease: "power2.out" 
-        })
+        gsap.to(navbarRef.current, { y: -100, duration: 0.3, ease: "power2.out" })
       } else {
-        gsap.to(navbarRef.current, { 
-          y: 0, 
-          duration: 0.3, 
-          ease: "power2.out" 
-        })
+        gsap.to(navbarRef.current, { y: 0, duration: 0.3, ease: "power2.out" })
       }
     }
 
@@ -88,37 +80,22 @@ export default function Hero() {
     }
   }, [isHovering])
 
-  // 处理顶部区域悬停
   const handleTopAreaHover = (isHovering: boolean) => {
     setIsHovering(isHovering)
-    
     if (isHovering) {
-      // 清除之前的定时器
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current)
-      }
-      // 显示 navbar
-      gsap.to(navbarRef.current, { 
-        y: 0, 
-        duration: 0.3, 
-        ease: "power2.out" 
-      })
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current)
+      gsap.to(navbarRef.current, { y: 0, duration: 0.3, ease: "power2.out" })
     } else {
-      // 设置延迟隐藏
       hideTimeoutRef.current = setTimeout(() => {
         if (window.scrollY > 0) {
-          gsap.to(navbarRef.current, { 
-            y: -100, 
-            duration: 0.3, 
-            ease: "power2.out" 
-          })
+          gsap.to(navbarRef.current, { y: -100, duration: 0.3, ease: "power2.out" })
         }
-      }, 3000) // 3秒后隐藏
+      }, 3000)
     }
   }
 
   return (
-    <section ref={sectionRef} className="relative h-screen w-full overflow-hidden scrollbar-hide">
+    <section ref={sectionRef} id="hero" className="relative h-screen w-full overflow-hidden scrollbar-hide">
       {/* 顶部悬停区域 */}
       <div
         ref={topAreaRef}
@@ -145,39 +122,90 @@ export default function Hero() {
         className="fixed top-0 left-0 w-full px-6 py-4 flex justify-between items-center z-50 text-white backdrop-blur-md bg-black/30 transition-transform duration-500"
       >
         <div className="text-2xl font-bold">
-          <img src="/assets/LOGO.png" alt="Logo" className="w-40 h-20" />
-        </div>
-        <nav className="space-x-6 hidden md:flex">
-          <a
+          <img
+            src="/assets/LOGO.png"
+            alt="Logo"
             onClick={(e) => {
               e.preventDefault()
               gsap.to(window, {
-                scrollTo: "#about",
+                scrollTo: "#hero",
                 duration: 1.2,
                 ease: "power2.inOut"
               })
             }}
-            className="cursor-pointer hover:underline"
-          >
-            About
-          </a>
-          <a href="#venues" className="hover:underline">Venues</a>
-          <a href="#contact" className="hover:underline">Contact</a>
+            className="w-40 h-20 cursor-pointer"
+          />
+        </div>
+
+        {/* Desktop Nav */}
+        <nav className="space-x-6 hidden md:flex">
+          {[
+            { label: "About", id: "#about" },
+            { label: "Venues", id: "#venues" },
+            { label: "Contact", id: "#contact" },
+            { label: "Careers", id: "#joinus" }
+          ].map((item, i) => (
+            <a
+              key={i}
+              onClick={(e) => {
+                e.preventDefault()
+                gsap.to(window, {
+                  scrollTo: item.id,
+                  duration: 1.2,
+                  ease: "power2.inOut"
+                })
+              }}
+              className="cursor-pointer hover:underline"
+            >
+              {item.label}
+            </a>
+          ))}
         </nav>
+
+        {/* Hamburger Icon for Mobile */}
+        <button
+          className="md:hidden text-white z-50"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 6.75h15m-15 5.25h15m-15 5.25h15" />
+          </svg>
+        </button>
       </header>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-40 flex flex-col items-center justify-center space-y-8 text-white text-2xl transition-all duration-300">
+          {[
+            { label: "About", id: "#about" },
+            { label: "Venues", id: "#venues" },
+            { label: "Contact", id: "#contact" },
+            { label: "Careers", id: "#joinus" }
+          ].map((item, i) => (
+            <a
+              key={i}
+              onClick={() => {
+                setIsMobileMenuOpen(false)
+                gsap.to(window, {
+                  scrollTo: item.id,
+                  duration: 1.2,
+                  ease: "power2.inOut"
+                })
+              }}
+              className="cursor-pointer hover:underline"
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      )}
 
       {/* 中央文字層 */}
       <div className="flex flex-col items-center justify-center h-full text-white text-center px-4">
-        <h1
-          ref={titleRef}
-          className="text-5xl md:text-7xl font-bold mb-6 drop-shadow-lg"
-        >
+        <h1 ref={titleRef} className="text-5xl md:text-7xl font-bold mb-6 drop-shadow-lg">
           Welcome to Our Future
         </h1>
-        <p
-          ref={subtitleRef}
-          className="text-lg md:text-2xl max-w-xl drop-shadow-md"
-        >
+        <p ref={subtitleRef} className="text-lg md:text-2xl max-w-xl drop-shadow-md">
           Experience a new level of digital innovation
         </p>
       </div>
