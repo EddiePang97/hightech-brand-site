@@ -144,7 +144,9 @@ export default function Hero() {
         ref={navbarRef}
         className="fixed top-0 left-0 w-full px-6 py-4 flex justify-between items-center z-50 text-white backdrop-blur-md bg-black/30 transition-transform duration-500"
       >
-        <div className="text-2xl font-bold">YourLogo</div>
+        <div className="text-2xl font-bold">
+          <img src="/assets/LOGO.png" alt="Logo" className="w-40 h-20" />
+        </div>
         <nav className="space-x-6 hidden md:flex">
           <a
             onClick={(e) => {
